@@ -16,13 +16,22 @@ app.use(morgan("dev"));
 
 connectDb();
 
+
+
+
 const start = () => {
     try {
       
       const listener = app.listen(process.env.PORT, () => {
-        console.log(`connected to server`);
+        console.log(`connected to server escuchando puerto ${process.env.PORT}`);
       });
-      const io = socketio(listener);
+
+      
+      const io = socketio(listener, {
+        cors: {
+          origin: '*',
+        }
+      });
       handleSockets(io);
     } catch (e) {
       console.error(e);
