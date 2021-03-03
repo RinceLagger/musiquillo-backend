@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  games: [{ type: Schema.Types.ObjectId, ref: "Room" }],
+  games: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
 });
 
 module.exports = mongoose.model("User", UserSchema);

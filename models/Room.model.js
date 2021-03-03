@@ -1,8 +1,8 @@
 const { Schema, model } = require("mongoose");
 
 const RoomModel = new Schema({
-  title: {
-    type: String,
+  roomId: {
+    type: Number,
     require: true,
     unique: true,
   },
@@ -10,6 +10,7 @@ const RoomModel = new Schema({
     {
       username: {
         type: String,
+        unique: true,
       },
       points: {
         type: Number,
@@ -20,7 +21,8 @@ const RoomModel = new Schema({
   turn: {
     type: Number,
     default: 0,
-  }
+  },
+  status: { type: String, enum: ["start","playing", "finished"], default: "start" },
 });
 
 module.exports = model("Room", RoomModel);
