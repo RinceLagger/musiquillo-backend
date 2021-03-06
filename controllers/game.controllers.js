@@ -3,8 +3,8 @@ const User = require("../models/user.model");
 
 
 const joinRoom = async(username, roomId)=>{
-
-    const room = await Room.findOne({roomId});
+    try{
+        const room = await Room.findOne({roomId});
 
     if(room && room.status!=="start"){
         //identificador de sala ya existente
@@ -20,8 +20,13 @@ const joinRoom = async(username, roomId)=>{
         const {
             _doc: room
           } = await Room.create({roomId,users:[{username}]});
+          console.log(room)
           return room.users;
     }
+    }catch(e){
+        console.log(e)
+    }
+    
 
 }
 

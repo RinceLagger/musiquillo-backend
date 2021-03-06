@@ -2,24 +2,31 @@ const { joinRoom } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
-    socket.on("join", ({ username, roomId }) => {
+    console.log(socket.id)
+    socket.on("join", async({ username, roomId }) => {
       socket.join(roomId);
-      const players = joinRoom(username, roomId);
+      const players = await joinRoom(username, roomId)
 
       if (!players) {
         io.to(roomId).emit("duplicatedRoom", {});
         socket.leave(roomId);
       } else {
+        console.log("players", players)
         io.to(roomId).emit("players", { players });
       }
 
-      //socket.emit("joinedRoom", { msg: `just joined room ${roomId}` });
+      //
     });
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
     socket.on("newAudio", ({ sourcePlay, roomId }) => {
       io.to(roomId).emit("newAudio", { sourcePlay });
     });
+
+    // socket.on("message", ({ message }) => {
+    //   console.log(message)
+    //   socket.broadcast.emit("message", { message });
+    // });
 
     // notify users upon disconnection
     socket.on("disconnect", () => {
