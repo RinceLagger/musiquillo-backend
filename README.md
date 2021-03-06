@@ -166,8 +166,15 @@ Song model
 
 ### Trello/Kanban
 
+[Link to your trello board](https://trello.com/b/i6dYtRCx/ironhack-musiquillo)
+
 
 ### Git
+
+[Client repository Link](https://github.com/RinceLagger/musiquillo-frontend)
+
+[Server repository Link](https://github.com/RinceLagger/musiquillo-backend)
+
 
 
 ### Slides
