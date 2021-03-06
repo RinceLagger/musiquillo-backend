@@ -71,7 +71,7 @@ exports.login = async (req, res) => {
 
     
     console.log(req.session)
-    //req.session.currentUser = usuario;
+    req.session.currentUser = user;
     return res.status(200).json(user);
   } catch (e) {
     return res.status(400).json({ message: "wrong request" });

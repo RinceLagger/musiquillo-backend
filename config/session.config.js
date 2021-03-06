@@ -10,7 +10,7 @@ module.exports = (app) => {
       saveUninitialized: true,
       cookie: { maxAge: 60000 },
       store: MongoStore.create({
-        mongoUrl: 'mongodb://localhost/musiquillo',
+        mongoUrl: MONGODB_URI,
         ttl: 60 * 60 * 24,
       }),
     })

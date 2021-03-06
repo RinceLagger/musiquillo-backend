@@ -3,12 +3,13 @@ const { handleSockets } = require("./sockets");
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const AuthRouter = require('./routes/auth.routes')
+require("./config/db.config")();
 
-require("./config/db.config")(app).then(()=>{
-  require("./config/middleware.config")(app);
-  require("./config/session.config")(app);
-});
+require("./config/session.config")(app);
+require("./config/middleware.config")(app);
 
+app.use("/",AuthRouter)
 
 const listener = app.listen(process.env.PORT, () => {
   console.log(`connected to server escuchando puerto ${process.env.PORT}`);
