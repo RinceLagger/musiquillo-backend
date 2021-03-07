@@ -2,6 +2,9 @@ const Room = require("../models/Room.model");
 const User = require("../models/user.model");
 
 
+const isMongoError = ({ code: errorCode }) => errorCode === 11000;
+
+
 const joinRoom = async(username, roomId)=>{
     try{
         const room = await Room.findOne({roomId});
@@ -12,7 +15,9 @@ const joinRoom = async(username, roomId)=>{
     }
     else if(room && room.status==="start"){
         //sala creada por el jugador anfitrión
-        const room = await Room.findOneAndUpdate({roomId}, {$push: {users: username} }, {new: true});
+        console.log("introduciendo nuevo player")
+        const room = await Room.findOneAndUpdate({roomId}, {$push: {users: {username}} }, {new: true});
+        console.log(room)
         return room.users;
     }
     else{
@@ -25,6 +30,8 @@ const joinRoom = async(username, roomId)=>{
     }
     }catch(e){
         console.log(e)
+        if(isMongoError(e)) return "wrongCode";
+        
     }
     
 

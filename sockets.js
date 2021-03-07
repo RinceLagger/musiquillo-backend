@@ -6,11 +6,18 @@ exports.handleSockets = (io) => {
     socket.on("join", async({ username, roomId }) => {
       socket.join(roomId);
       const players = await joinRoom(username, roomId)
+      const rooms = io.of("/").adapter.rooms;
+      console.log("rooms", rooms)
 
       if (!players) {
         io.to(roomId).emit("duplicatedRoom", {});
         socket.leave(roomId);
-      } else {
+      }else if(players === "wrongCode"){
+        io.to(roomId).emit("wrongCode", {});
+        socket.leave(roomId);
+      }
+      
+      else {
         console.log("players", players)
         io.to(roomId).emit("players", { players });
       }
