@@ -1,13 +1,13 @@
-const { joinRoom } = require("./controllers/game.controllers");
+const { joinRoom, startGame } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
     console.log(socket.id)
     socket.on("join", async({ username, roomId }) => {
       socket.join(roomId);
-      const players = await joinRoom(username, roomId)
+      const players = await joinRoom(username, roomId);
       const rooms = io.of("/").adapter.rooms;
-      console.log("rooms", rooms)
+      console.log("rooms", rooms);
 
       if (!players) {
         io.to(roomId).emit("duplicatedRoom", {});
@@ -23,6 +23,11 @@ exports.handleSockets = (io) => {
       }
 
       //
+    });
+
+    socket.on("start", async({ username, roomId }) => {
+      const turn = await startGame(roomId);
+      io.to(roomId).emit("start", { turn });
     });
 
     //recibe un audio y lo retrasmite a todos los de la misma sala

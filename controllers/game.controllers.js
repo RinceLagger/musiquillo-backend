@@ -37,4 +37,18 @@ const joinRoom = async(username, roomId)=>{
 
 }
 
-module.exports = {joinRoom};
+const startGame = async(roomId)=>{
+    try{
+        console.log("pasamos room a status playing")
+        const room = await Room.findOneAndUpdate({roomId}, {status: "playing" }, {new: true});
+        return room.turn;
+    }catch(e){
+        console.error(e);
+    }
+
+
+
+
+}
+
+module.exports = {joinRoom, startGame};
