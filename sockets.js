@@ -1,4 +1,4 @@
-const { joinRoom, startGame } = require("./controllers/game.controllers");
+const { joinRoom, startGame, getSongs } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
@@ -25,9 +25,10 @@ exports.handleSockets = (io) => {
       //
     });
 
-    socket.on("start", async({ username, roomId }) => {
+    socket.on("start", async({ username, roomId, players }) => {
       const turn = await startGame(roomId);
-      io.to(roomId).emit("start", { turn });
+      const songs = await getSongs(players)
+      io.to(roomId).emit("start", { turn, songs });
     });
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
