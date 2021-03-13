@@ -71,4 +71,37 @@ const getSongs = async (numPlayers) => {
 
 }
 
-module.exports = { joinRoom, startGame, getSongs };
+const addPoint = async (username, roomId) => {
+  try{
+      
+    const room = await Room.findOne({ roomId });
+
+    const userUpdate = room.users.map(user =>{
+      if(user.username !==username){
+        return user;
+      }else{
+        user.points++;
+        return user;
+      }
+    })
+
+    const roomUpdate = await Room.findOneAndUpdate(
+      { roomId },
+      { users: userUpdate },
+      { new: true }
+    );
+    
+
+    //console.log("sumado puntos: ", userUpdate);
+    return roomUpdate.users;
+
+
+  }catch(e){
+      console.error(e);
+  }
+
+
+
+}
+
+module.exports = { joinRoom, startGame, getSongs, addPoint };

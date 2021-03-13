@@ -1,4 +1,4 @@
-const { joinRoom, startGame, getSongs } = require("./controllers/game.controllers");
+const { joinRoom, startGame, getSongs, addPoint } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
@@ -29,12 +29,24 @@ exports.handleSockets = (io) => {
       const turn = await startGame(roomId);
       const songs = await getSongs(players)
       io.to(roomId).emit("start", { turn, songs });
+      
+
     });
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
     socket.on("newAudio", ({ sourcePlay, roomId }) => {
       io.to(roomId).emit("newAudio", { sourcePlay });
+      setTimeout(()=>{ 
+        io.to(roomId).emit("timeOver", { });
+       }, 30000);
     });
+
+    socket.on("point", async({ username, roomId })=>{
+
+      
+      const players = await addPoint(username, roomId);
+      console.log("sumar punto", players)
+    })
 
     // socket.on("message", ({ message }) => {
     //   console.log(message)
