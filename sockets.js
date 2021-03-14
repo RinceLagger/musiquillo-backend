@@ -4,6 +4,7 @@ const {
   getSongs,
   addPoint,
   nextRound,
+  gameOver
 } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
@@ -59,6 +60,10 @@ exports.handleSockets = (io) => {
         }, 10000);
       }else{
         console.log("juego terminado")
+        gameOver(roomId);
+        setTimeout(() => {
+          io.to(roomId).emit("showWinner", {});
+        }, 10000);
       }
 
 
