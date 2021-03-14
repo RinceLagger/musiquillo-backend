@@ -3,6 +3,7 @@ const {
   startGame,
   getSongs,
   addPoint,
+  nextRound,
 } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
@@ -46,6 +47,21 @@ exports.handleSockets = (io) => {
       const players = await addPoint(username, roomId);
       console.log("sumar punto", players);
       io.to(roomId).emit("updatePoints", { players });
+    });
+
+    socket.on("nextRound", async ({  roomId, numPlayers }) => {
+
+      const turno = await nextRound(roomId);
+      if(turno<numPlayers){//aún no se ha acabado la partida, 1 turno por jugador
+        
+        setTimeout(() => {
+          io.to(roomId).emit("nextRound", {turno});
+        }, 10000);
+      }else{
+        console.log("juego terminado")
+      }
+
+
     });
 
     // socket.on("message", ({ message }) => {

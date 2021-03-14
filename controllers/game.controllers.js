@@ -108,8 +108,30 @@ const addPoint = async (username, roomId) => {
       console.error(e);
   }
 
-
-
 }
 
-module.exports = { joinRoom, startGame, getSongs, addPoint };
+  const nextRound = async (roomId)=>{
+    try{
+
+      
+
+      const roomUpdate = await Room.findOneAndUpdate(
+        { roomId },
+        { 
+        roundWinner: false,
+        $inc: {turn: 1},  },
+        { new: true }
+      );
+
+      return roomUpdate.turn;
+
+    }catch(e){
+      console.error(e);
+    }
+  }
+
+
+
+
+
+module.exports = { joinRoom, startGame, getSongs, addPoint, nextRound };
