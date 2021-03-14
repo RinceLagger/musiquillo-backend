@@ -1,9 +1,14 @@
-const { joinRoom, startGame, getSongs, addPoint } = require("./controllers/game.controllers");
+const {
+  joinRoom,
+  startGame,
+  getSongs,
+  addPoint,
+} = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
-    console.log(socket.id)
-    socket.on("join", async({ username, roomId }) => {
+    console.log(socket.id);
+    socket.on("join", async ({ username, roomId }) => {
       socket.join(roomId);
       const players = await joinRoom(username, roomId);
       const rooms = io.of("/").adapter.rooms;
@@ -12,41 +17,36 @@ exports.handleSockets = (io) => {
       if (!players) {
         io.to(roomId).emit("duplicatedRoom", {});
         socket.leave(roomId);
-      }else if(players === "wrongCode"){
+      } else if (players === "wrongCode") {
         io.to(roomId).emit("wrongCode", {});
         socket.leave(roomId);
-      }
-      
-      else {
-        console.log("players", players)
+      } else {
+        console.log("players", players);
         io.to(roomId).emit("players", { players });
       }
 
       //
     });
 
-    socket.on("start", async({ username, roomId, players }) => {
+    socket.on("start", async ({ username, roomId, players }) => {
       const turn = await startGame(roomId);
-      const songs = await getSongs(players)
+      const songs = await getSongs(players);
       io.to(roomId).emit("start", { turn, songs });
-      
-
     });
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
     socket.on("newAudio", ({ sourcePlay, roomId }) => {
       io.to(roomId).emit("newAudio", { sourcePlay });
-      setTimeout(()=>{ 
-        io.to(roomId).emit("timeOver", { });
-       }, 30000);
+      setTimeout(() => {
+        io.to(roomId).emit("timeOver", {});
+      }, 30000);
     });
 
-    socket.on("point", async({ username, roomId })=>{
-
-      
+    socket.on("point", async ({ username, roomId }) => {
       const players = await addPoint(username, roomId);
-      console.log("sumar punto", players)
-    })
+      console.log("sumar punto", players);
+      io.to(roomId).emit("updatePoints", { players });
+    });
 
     // socket.on("message", ({ message }) => {
     //   console.log(message)

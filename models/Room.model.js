@@ -22,6 +22,10 @@ const RoomModel = new Schema({
     type: Number,
     default: 0,
   },
+  roundWinner: {
+    type: Boolean,
+    default: false,
+  },
   status: { type: String, enum: ["start","playing", "finished"], default: "start" },
 });
 

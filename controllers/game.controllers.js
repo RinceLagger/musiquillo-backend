@@ -76,18 +76,26 @@ const addPoint = async (username, roomId) => {
       
     const room = await Room.findOne({ roomId });
 
+    let roundWinner = room.roundWinner;
+
     const userUpdate = room.users.map(user =>{
       if(user.username !==username){
         return user;
       }else{
-        user.points++;
+        if(!roundWinner){//no hay ganador todavía de la ronda
+          user.points+=30;
+          roundWinner = true;
+        }else{
+          user.points+=10;
+        }
         return user;
       }
     })
 
     const roomUpdate = await Room.findOneAndUpdate(
       { roomId },
-      { users: userUpdate },
+      { users: userUpdate,
+        roundWinner},
       { new: true }
     );
     
