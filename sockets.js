@@ -37,8 +37,8 @@ exports.handleSockets = (io) => {
     });
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
-    socket.on("newAudio", ({ sourcePlay, roomId }) => {
-      io.to(roomId).emit("newAudio", { sourcePlay });
+    socket.on("newAudio", ({ blob, roomId }) => {
+      io.to(roomId).emit("newAudio", { blob });
       setTimeout(() => {
         io.to(roomId).emit("timeOver", {});
       }, 30000);
