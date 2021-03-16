@@ -17,7 +17,7 @@ const listener = app.listen(process.env.PORT, () => {
 
 const io = socketio(listener, {
   cors: {
-    origin: "*",
+    origin: process.env.ORIGIN,
   },
 });
 handleSockets(io);

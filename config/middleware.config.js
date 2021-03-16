@@ -3,8 +3,8 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 require("dotenv").config();
-const { ORIGIN } = process.env;
-const corsConfig = { origin: [ORIGIN], credentials: true };
+//const { ORIGIN } = process.env;
+const corsConfig = { origin: process.env.ORIGIN, credentials: true };
 
 
 
