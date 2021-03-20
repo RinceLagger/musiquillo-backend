@@ -70,10 +70,10 @@ exports.handleSockets = (io) => {
 
     });
 
-    // socket.on("message", ({ message }) => {
-    //   console.log(message)
-    //   socket.broadcast.emit("message", { message });
-    // });
+    socket.on("wrongGuess", ({ username,guess, roomId }) => {
+      console.log(guess)
+      io.to(roomId).emit("wrongGuess", {username,guess});
+    });
 
     // notify users upon disconnection
     socket.on("disconnect", () => {
