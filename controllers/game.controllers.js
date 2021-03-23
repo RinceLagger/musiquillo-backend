@@ -182,8 +182,50 @@ const addPoint = async (username, roomId) => {
     }
   }
 
+  const deleteRoom = async (roomId)=>{
+    try{
+
+      
+
+      await Room.findOneAndDelete(
+        { roomId },
+      );
+
+      
+
+    }catch(e){
+      console.error(e);
+    }
+  }
+
+  const deleteUser = async (username, roomId)=>{
+    try{
+
+      const room = await Room.findOne({ roomId });
+
+      
+  
+      const userUpdate = room.users.filter(user =>user.username != username);
+  
+      const roomUpdate = await Room.findOneAndUpdate(
+        { roomId },
+        { users: userUpdate,
+          },
+        { new: true }
+      );
+      
+  
+      //console.log("sumado puntos: ", userUpdate);
+      return roomUpdate.users;
+
+      
+
+    }catch(e){
+      console.error(e);
+    }
+  }
 
 
 
 
-module.exports = {createRoom, joinRoom, startGame, getSongs, addPoint, nextRound, gameOver };
+module.exports = {createRoom, joinRoom, startGame, getSongs, addPoint, nextRound, gameOver, deleteRoom, deleteUser };

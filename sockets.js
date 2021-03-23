@@ -5,7 +5,9 @@ const {
   getSongs,
   addPoint,
   nextRound,
-  gameOver
+  gameOver,
+  deleteRoom,
+  deleteUser
 } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
@@ -41,7 +43,7 @@ exports.handleSockets = (io) => {
         io.to(roomId).emit("wrongCode", {});
         socket.leave(roomId);
       } else {
-        console.log("players", players);
+        //console.log("players", players);
         io.to(roomId).emit("players", { players });
       }
 
@@ -91,6 +93,16 @@ exports.handleSockets = (io) => {
     socket.on("wrongGuess", ({ username,guess, roomId }) => {
       console.log(guess)
       io.to(roomId).emit("wrongGuess", {username,guess});
+    });
+
+    socket.on("deleteRoom", ({  roomId }) => {
+      deleteRoom(roomId);
+      io.to(roomId).emit("deleteRoom", {});
+    });
+
+    socket.on("deleteUser", async({ username , roomId }) => {
+      const players = await deleteUser( username, roomId);
+      io.to(roomId).emit("players", { players });
     });
 
     // notify users upon disconnection
