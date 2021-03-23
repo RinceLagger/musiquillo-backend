@@ -1,4 +1,5 @@
 const {
+  createRoom,
   joinRoom,
   startGame,
   getSongs,
@@ -10,11 +11,28 @@ const {
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
     console.log(socket.id);
+
+    socket.on("createRoom", async ({ username, roomId }) => {
+
+      const players = await createRoom(username, roomId);
+      console.log("players", players);
+      if(players){
+        socket.join(roomId);
+        console.log("players", players);
+        io.to(roomId).emit("players", { players });
+      }
+
+
+    })
+
+
+
+
     socket.on("join", async ({ username, roomId }) => {
       socket.join(roomId);
       const players = await joinRoom(username, roomId);
-      const rooms = io.of("/").adapter.rooms;
-      console.log("rooms", rooms);
+      // const rooms = io.of("/").adapter.rooms;
+      // console.log("rooms", rooms);
 
       if (!players) {
         io.to(roomId).emit("duplicatedRoom", {});

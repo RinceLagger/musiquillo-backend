@@ -4,10 +4,35 @@ const Song = require("../models/Song.model");
 
 const isMongoError = ({ code: errorCode }) => errorCode === 11000;
 
+const createRoom = async (username, roomId) => {
+
+  try {
+    const room = await Room.findOne({ roomId });
+    
+   if(!room) {
+      //nueva sala
+      const { _doc: room } = await Room.create({
+        roomId,
+        users: [{ username }],
+      });
+      console.log(room);
+      return room.users;
+    }
+  } catch (e) {
+    console.log(e);
+   
+  }
+
+
+}
+
+
+
+
 const joinRoom = async (username, roomId) => {
   try {
     const room = await Room.findOne({ roomId });
-
+    console.log(room)
     if (room && room.status !== "start") {
       //identificador de sala ya existente
       return null;
@@ -23,12 +48,12 @@ const joinRoom = async (username, roomId) => {
       return room.users;
     } else {
       //nueva sala
-      const { _doc: room } = await Room.create({
-        roomId,
-        users: [{ username }],
-      });
-      console.log(room);
-      return room.users;
+      // const { _doc: room } = await Room.create({
+      //   roomId,
+      //   users: [{ username }],
+      // });
+      // console.log(room);
+      return "wrongCode";
     }
   } catch (e) {
     console.log(e);
@@ -57,7 +82,7 @@ const getSongs = async (numPlayers) => {
         
         const songs = songsArray.slice(0,numPlayers);
 
-        console.log(songs);
+        //console.log(songs);
         return songs;
 
 
@@ -135,12 +160,20 @@ const addPoint = async (username, roomId) => {
 
       
 
-      const roomUpdate = await Room.findOneAndUpdate(
+      const {_id: gameId, users} = await Room.findOneAndUpdate(
         { roomId },
         { 
           status: "finished"   },
         { new: true }
       );
+
+      users.forEach(async(user)=>{
+        let username = user.username;
+        await User.findOneAndUpdate(
+          { username },
+          { $push: { games: gameId} },
+          { new: true })
+      });
 
       
 
@@ -153,4 +186,4 @@ const addPoint = async (username, roomId) => {
 
 
 
-module.exports = { joinRoom, startGame, getSongs, addPoint, nextRound, gameOver };
+module.exports = {createRoom, joinRoom, startGame, getSongs, addPoint, nextRound, gameOver };
