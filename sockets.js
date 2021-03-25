@@ -7,7 +7,7 @@ const {
   nextRound,
   gameOver,
   deleteRoom,
-  deleteUser
+  deleteUser,
 } = require("./controllers/game.controllers");
 
 exports.handleSockets = (io) => {
@@ -15,20 +15,14 @@ exports.handleSockets = (io) => {
     console.log(socket.id);
 
     socket.on("createRoom", async ({ username, roomId }) => {
-
       const players = await createRoom(username, roomId);
       console.log("players", players);
-      if(players){
+      if (players) {
         socket.join(roomId);
         console.log("players", players);
         io.to(roomId).emit("players", { players });
       }
-
-
-    })
-
-
-
+    });
 
     socket.on("join", async ({ username, roomId }) => {
       socket.join(roomId);
@@ -58,7 +52,7 @@ exports.handleSockets = (io) => {
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
     socket.on("newAudio", ({ blob, roomId }) => {
-      console.log(blob)
+      console.log(blob);
       io.to(roomId).emit("newAudio", { blob });
       setTimeout(() => {
         io.to(roomId).emit("timeOver", {});
@@ -71,37 +65,35 @@ exports.handleSockets = (io) => {
       io.to(roomId).emit("updatePoints", { players });
     });
 
-    socket.on("nextRound", async ({  roomId, numPlayers }) => {
-
+    socket.on("nextRound", async ({ roomId, numPlayers }) => {
       const turno = await nextRound(roomId);
-      if(turno<numPlayers){//aún no se ha acabado la partida, 1 turno por jugador
-        
+      if (turno < numPlayers) {
+        //aún no se ha acabado la partida, 1 turno por jugador
+
         setTimeout(() => {
-          io.to(roomId).emit("nextRound", {turno});
+          io.to(roomId).emit("nextRound", { turno });
         }, 10000);
-      }else{
-        console.log("juego terminado")
+      } else {
+        console.log("juego terminado");
         gameOver(roomId);
         setTimeout(() => {
           io.to(roomId).emit("showWinner", {});
         }, 10000);
       }
-
-
     });
 
-    socket.on("wrongGuess", ({ username,guess, roomId }) => {
-      console.log(guess)
-      io.to(roomId).emit("wrongGuess", {username,guess});
+    socket.on("wrongGuess", ({ username, guess, roomId }) => {
+      console.log(guess);
+      io.to(roomId).emit("wrongGuess", { username, guess });
     });
 
-    socket.on("deleteRoom", ({  roomId }) => {
+    socket.on("deleteRoom", ({ roomId }) => {
       deleteRoom(roomId);
       io.to(roomId).emit("deleteRoom", {});
     });
 
-    socket.on("deleteUser", async({ username , roomId }) => {
-      const players = await deleteUser( username, roomId);
+    socket.on("deleteUser", async ({ username, roomId }) => {
+      const players = await deleteUser(username, roomId);
       io.to(roomId).emit("players", { players });
     });
 

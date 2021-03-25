@@ -5,11 +5,10 @@ const Song = require("../models/Song.model");
 const isMongoError = ({ code: errorCode }) => errorCode === 11000;
 
 const createRoom = async (username, roomId) => {
-
   try {
     const room = await Room.findOne({ roomId });
-    
-   if(!room) {
+
+    if (!room) {
       //nueva sala
       const { _doc: room } = await Room.create({
         roomId,
@@ -20,19 +19,13 @@ const createRoom = async (username, roomId) => {
     }
   } catch (e) {
     console.log(e);
-   
   }
-
-
-}
-
-
-
+};
 
 const joinRoom = async (username, roomId) => {
   try {
     const room = await Room.findOne({ roomId });
-    console.log(room)
+    console.log(room);
     if (room && room.status !== "start") {
       //identificador de sala ya existente
       return null;
@@ -75,157 +68,141 @@ const startGame = async (roomId) => {
   }
 };
 
-
-const getSongs = async (numPlayers) => {
-    try{
-        const songsArray = await Song.find({});
-        
-        const songs = songsArray.slice(0,numPlayers);
-
-        //console.log(songs);
-        return songs;
-
-
-
-
-    }catch(e){
-        console.error(e);
-    }
-
-
-
+function shuffle(a) {
+  var j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+      j = Math.floor(Math.random() * (i + 1));
+      x = a[i];
+      a[i] = a[j];
+      a[j] = x;
+  }
+  
 }
 
+const getSongs = async (numPlayers) => {
+  try {
+    const songsArray = await Song.find({});
+
+    shuffle(songsArray);
+    
+    const songs = songsArray.slice(0, numPlayers);
+
+    //console.log(songs);
+    return songs;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
 const addPoint = async (username, roomId) => {
-  try{
-      
+  try {
     const room = await Room.findOne({ roomId });
 
     let roundWinner = room.roundWinner;
 
-    const userUpdate = room.users.map(user =>{
-      if(user.username !==username){
+    const userUpdate = room.users.map((user) => {
+      if (user.username !== username) {
         return user;
-      }else{
-        if(!roundWinner){//no hay ganador todavía de la ronda
-          user.points+=30;
+      } else {
+        if (!roundWinner) {
+          //no hay ganador todavía de la ronda
+          user.points += 30;
           roundWinner = true;
-        }else{
-          user.points+=10;
+        } else {
+          user.points += 10;
         }
         return user;
       }
-    })
+    });
 
     const roomUpdate = await Room.findOneAndUpdate(
       { roomId },
-      { users: userUpdate,
-        roundWinner},
+      { users: userUpdate, roundWinner },
       { new: true }
     );
-    
 
     //console.log("sumado puntos: ", userUpdate);
     return roomUpdate.users;
-
-
-  }catch(e){
-      console.error(e);
+  } catch (e) {
+    console.error(e);
   }
+};
 
-}
-
-  const nextRound = async (roomId)=>{
-    try{
-
-      
-
-      const roomUpdate = await Room.findOneAndUpdate(
-        { roomId },
-        { 
+const nextRound = async (roomId) => {
+  try {
+    const roomUpdate = await Room.findOneAndUpdate(
+      { roomId },
+      {
         roundWinner: false,
-        $inc: {turn: 1},  },
+        $inc: { turn: 1 },
+      },
+      { new: true }
+    );
+
+    return roomUpdate.turn;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+const gameOver = async (roomId) => {
+  try {
+    const { _id: gameId, users } = await Room.findOneAndUpdate(
+      { roomId },
+      {
+        status: "finished",
+      },
+      { new: true }
+    );
+
+    users.forEach(async (user) => {
+      let username = user.username;
+      await User.findOneAndUpdate(
+        { username },
+        { $push: { games: gameId } },
         { new: true }
       );
-
-      return roomUpdate.turn;
-
-    }catch(e){
-      console.error(e);
-    }
+    });
+  } catch (e) {
+    console.error(e);
   }
+};
 
-  const gameOver = async (roomId)=>{
-    try{
-
-      
-
-      const {_id: gameId, users} = await Room.findOneAndUpdate(
-        { roomId },
-        { 
-          status: "finished"   },
-        { new: true }
-      );
-
-      users.forEach(async(user)=>{
-        let username = user.username;
-        await User.findOneAndUpdate(
-          { username },
-          { $push: { games: gameId} },
-          { new: true })
-      });
-
-      
-
-    }catch(e){
-      console.error(e);
-    }
+const deleteRoom = async (roomId) => {
+  try {
+    await Room.findOneAndDelete({ roomId });
+  } catch (e) {
+    console.error(e);
   }
+};
 
-  const deleteRoom = async (roomId)=>{
-    try{
+const deleteUser = async (username, roomId) => {
+  try {
+    const room = await Room.findOne({ roomId });
 
-      
+    const userUpdate = room.users.filter((user) => user.username != username);
 
-      await Room.findOneAndDelete(
-        { roomId },
-      );
+    const roomUpdate = await Room.findOneAndUpdate(
+      { roomId },
+      { users: userUpdate },
+      { new: true }
+    );
 
-      
-
-    }catch(e){
-      console.error(e);
-    }
+    //console.log("sumado puntos: ", userUpdate);
+    return roomUpdate.users;
+  } catch (e) {
+    console.error(e);
   }
+};
 
-  const deleteUser = async (username, roomId)=>{
-    try{
-
-      const room = await Room.findOne({ roomId });
-
-      
-  
-      const userUpdate = room.users.filter(user =>user.username != username);
-  
-      const roomUpdate = await Room.findOneAndUpdate(
-        { roomId },
-        { users: userUpdate,
-          },
-        { new: true }
-      );
-      
-  
-      //console.log("sumado puntos: ", userUpdate);
-      return roomUpdate.users;
-
-      
-
-    }catch(e){
-      console.error(e);
-    }
-  }
-
-
-
-
-module.exports = {createRoom, joinRoom, startGame, getSongs, addPoint, nextRound, gameOver, deleteRoom, deleteUser };
+module.exports = {
+  createRoom,
+  joinRoom,
+  startGame,
+  getSongs,
+  addPoint,
+  nextRound,
+  gameOver,
+  deleteRoom,
+  deleteUser,
+};
