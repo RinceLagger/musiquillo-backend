@@ -81,7 +81,7 @@ exports.handleSockets = (io) => {
         }, 10000);
         setTimeout(() => {
           socket.disconnect(true);
-        }, 15000);
+        }, 20000);
       }
     });
 

@@ -24,6 +24,10 @@ const createRoom = async (username, roomId) => {
 
 const joinRoom = async (username, roomId) => {
   try {
+    
+    if(Number.isNaN(parseInt(roomId, 10))){
+      return "wrongCode";
+    }
     const room = await Room.findOne({ roomId });
     console.log(room);
     if (room && room.status !== "start") {
