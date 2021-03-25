@@ -12,14 +12,14 @@ const {
 
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
-    console.log(socket.id);
+    // console.log(socket.id);
 
     socket.on("createRoom", async ({ username, roomId }) => {
       const players = await createRoom(username, roomId);
-      console.log("players", players);
+      // console.log("players", players);
       if (players) {
         socket.join(roomId);
-        console.log("players", players);
+        // console.log("players", players);
         io.to(roomId).emit("players", { players });
       }
     });
@@ -52,7 +52,7 @@ exports.handleSockets = (io) => {
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
     socket.on("newAudio", ({ blob, roomId }) => {
-      console.log(blob);
+      // console.log(blob);
       io.to(roomId).emit("newAudio", { blob });
       setTimeout(() => {
         io.to(roomId).emit("timeOver", {});
@@ -79,6 +79,9 @@ exports.handleSockets = (io) => {
         setTimeout(() => {
           io.to(roomId).emit("showWinner", {});
         }, 10000);
+        setTimeout(() => {
+          socket.disconnect(true);
+        }, 15000);
       }
     });
 
@@ -98,10 +101,15 @@ exports.handleSockets = (io) => {
     });
 
     // notify users upon disconnection
-    socket.on("disconnect", () => {
-      socket.broadcast.emit("user disconnected", socket.id);
+    socket.on("disconnecting", () => {
+      // console.log("socket rooms:",socket.rooms)
+
+      let roomId = [...socket.rooms];
+      roomId = roomId[1];
+      // console.log(roomId)
       //si se desconecta durante una partida un usuario, avisamos a todos
       //y se termina la partida
+      io.to(roomId).emit("disconnection", {});
     });
   });
 };
