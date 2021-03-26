@@ -21,7 +21,7 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "wrong password format" });
     }
     const user = await User.findOne({ username });
-    
+
     if (user) {
       return res.status(400).json({ message: "user alredy exists" });
     }
@@ -49,7 +49,7 @@ exports.signup = async (req, res) => {
       imgUser: avatarImg,
     });
     req.session.currentUser = usuario;
-    
+
     return res.status(200).json(usuario);
   } catch (e) {
     return res.status(400).json({ message: "wrong request" });
@@ -76,7 +76,6 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "unauthorize" });
     }
 
-    
     req.session.currentUser = user;
     return res.status(200).json(user);
   } catch (e) {

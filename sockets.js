@@ -12,14 +12,12 @@ const {
 
 exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
-    // console.log(socket.id);
-
     socket.on("createRoom", async ({ username, roomId, img }) => {
       const players = await createRoom(username, roomId, img);
-      // console.log("players", players);
+
       if (players) {
         socket.join(roomId);
-        // console.log("players", players);
+
         io.to(roomId).emit("players", { players });
       }
     });
@@ -28,7 +26,6 @@ exports.handleSockets = (io) => {
       socket.join(roomId);
       const players = await joinRoom(username, roomId, img);
       // const rooms = io.of("/").adapter.rooms;
-      // console.log("rooms", rooms);
 
       if (!players) {
         io.to(roomId).emit("duplicatedRoom", {});
@@ -37,11 +34,8 @@ exports.handleSockets = (io) => {
         io.to(roomId).emit("wrongCode", {});
         socket.leave(roomId);
       } else {
-        
         io.to(roomId).emit("players", { players });
       }
-
-      //
     });
 
     socket.on("start", async ({ username, roomId, players }) => {
@@ -52,7 +46,6 @@ exports.handleSockets = (io) => {
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
     socket.on("newAudio", ({ blob, roomId }) => {
-      
       io.to(roomId).emit("newAudio", { blob });
       setTimeout(() => {
         io.to(roomId).emit("timeOver", {});
@@ -61,7 +54,7 @@ exports.handleSockets = (io) => {
 
     socket.on("point", async ({ username, roomId, turn }) => {
       const players = await addPoint(username, roomId, turn);
-      
+
       io.to(roomId).emit("updatePoints", { players });
     });
 
@@ -100,13 +93,10 @@ exports.handleSockets = (io) => {
       io.to(roomId).emit("players", { players });
     });
 
-    // notify users upon disconnection
     socket.on("disconnecting", () => {
-      // console.log("socket rooms:",socket.rooms)
-
       let roomId = [...socket.rooms];
       roomId = roomId[1];
-      // console.log(roomId)
+
       //si se desconecta durante una partida un usuario, avisamos a todos
       //y se termina la partida
       io.to(roomId).emit("disconnection", {});

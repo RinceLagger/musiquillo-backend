@@ -7,12 +7,12 @@ const isMongoError = ({ code: errorCode }) => errorCode === 11000;
 const createRoom = async (username, roomId, img) => {
   try {
     const room = await Room.findOne({ roomId });
-    console.log("imagen", img)
+    console.log("imagen", img);
     if (!room) {
       //nueva sala
       const { _doc: room } = await Room.create({
         roomId,
-        users: [{ username, imgUser:img }],
+        users: [{ username, imgUser: img }],
       });
       console.log(room);
       return room.users;
@@ -24,8 +24,8 @@ const createRoom = async (username, roomId, img) => {
 
 const joinRoom = async (username, roomId, img) => {
   try {
-    console.log("imagen", img)
-    if(Number.isNaN(parseInt(roomId, 10))){
+    console.log("imagen", img);
+    if (Number.isNaN(parseInt(roomId, 10))) {
       return "wrongCode";
     }
     const room = await Room.findOne({ roomId });
@@ -38,18 +38,12 @@ const joinRoom = async (username, roomId, img) => {
       console.log("introduciendo nuevo player");
       const room = await Room.findOneAndUpdate(
         { roomId },
-        { $push: { users: { username , imgUser:img } } },
+        { $push: { users: { username, imgUser: img } } },
         { new: true }
       );
       console.log(room);
       return room.users;
     } else {
-      //nueva sala
-      // const { _doc: room } = await Room.create({
-      //   roomId,
-      //   users: [{ username }],
-      // });
-      // console.log(room);
       return "wrongCode";
     }
   } catch (e) {
@@ -90,7 +84,6 @@ const getSongs = async (numPlayers) => {
 
     const songs = songsArray.slice(0, numPlayers);
 
-    //console.log(songs);
     return songs;
   } catch (e) {
     console.error(e);
@@ -102,9 +95,6 @@ const addPoint = async (username, roomId, turn) => {
     const room = await Room.findOne({ roomId });
 
     let roundWinner = room.roundWinner;
-
-    // console.log(turn)
-    // console.log(room.users[turn])
 
     const userUpdate = room.users.map((user) => {
       if (user.username !== username) {
@@ -122,7 +112,7 @@ const addPoint = async (username, roomId, turn) => {
     });
 
     //cada vez que alguien acierta se premia al cantante
-    userUpdate[turn].points +=5;
+    userUpdate[turn].points += 5;
 
     const roomUpdate = await Room.findOneAndUpdate(
       { roomId },
@@ -130,7 +120,6 @@ const addPoint = async (username, roomId, turn) => {
       { new: true }
     );
 
-    //console.log("sumado puntos: ", userUpdate);
     return roomUpdate.users;
   } catch (e) {
     console.error(e);
@@ -197,7 +186,6 @@ const deleteUser = async (username, roomId) => {
       { new: true }
     );
 
-    //console.log("sumado puntos: ", userUpdate);
     return roomUpdate.users;
   } catch (e) {
     console.error(e);
