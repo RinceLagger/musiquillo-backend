@@ -14,8 +14,8 @@ exports.handleSockets = (io) => {
   io.on("connect", (socket) => {
     // console.log(socket.id);
 
-    socket.on("createRoom", async ({ username, roomId }) => {
-      const players = await createRoom(username, roomId);
+    socket.on("createRoom", async ({ username, roomId, img }) => {
+      const players = await createRoom(username, roomId, img);
       // console.log("players", players);
       if (players) {
         socket.join(roomId);
@@ -24,9 +24,9 @@ exports.handleSockets = (io) => {
       }
     });
 
-    socket.on("join", async ({ username, roomId }) => {
+    socket.on("join", async ({ username, roomId, img }) => {
       socket.join(roomId);
-      const players = await joinRoom(username, roomId);
+      const players = await joinRoom(username, roomId, img);
       // const rooms = io.of("/").adapter.rooms;
       // console.log("rooms", rooms);
 

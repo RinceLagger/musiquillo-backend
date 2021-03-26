@@ -14,7 +14,7 @@ const isMongoError = ({ code: errorCode }) => errorCode === 11000;
 
 exports.signup = async (req, res) => {
   try {
-    console.log(req.body)
+    console.log(req.body);
     const { username, password, email } = req.body;
     const hasMissingCredentials = !password || !email || !username;
 
@@ -26,21 +26,36 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: "wrong format password" });
     }
     const user = await User.findOne({ username });
-    console.log(user)
+    console.log(user);
     if (user) {
       return res.status(400).json({ message: "user alredy exists" });
     }
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const passwordHashed = await bcrypt.hash(password, salt);
-    console.log(passwordHashed)
+    console.log(passwordHashed);
+
+    const avatarArray = [
+      "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar1_zrakdm.png",
+      "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar2_sowcia.png",
+      "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar3_hzhbxx.png",
+      "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar4_atc53o.png",
+      "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar5_b876ad.png",
+    ];
+
+    const avatarImg = avatarArray[Math.floor(Math.random() * 6)] ; 
 
     const {
       _doc: { hashedPassword, ...usuario },
-    } = await User.create({ username, email, hashedPassword: passwordHashed});
+    } = await User.create({
+      username,
+      email,
+      hashedPassword: passwordHashed,
+      imgUser: avatarImg,
+    });
     //req.session.currentUser = usuario;
-    console.log(req.session)
-    return res.status(200).json( usuario );
+    console.log(req.session);
+    return res.status(200).json(usuario);
   } catch (e) {
     return res.status(400).json({ message: "wrong request" });
   }
@@ -48,8 +63,8 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const  { username, password } = req.body;
-    console.log(req.body)
+    const { username, password } = req.body;
+    console.log(req.body);
     const hasMissingCredentials = !password || !username;
     if (hasMissingCredentials) {
       return res.status(400).json({ message: "missing credentials" });
@@ -57,20 +72,16 @@ exports.login = async (req, res) => {
     const {
       _doc: { hashedPassword, ...user },
     } = await User.findOne({ username });
-    console.log(user)
+    console.log(user);
     if (!user) {
       return res.status(400).json({ message: "user does not exist" });
     }
-    const hasCorrectPassword = await bcrypt.compare(
-      password,
-      hashedPassword
-    );
+    const hasCorrectPassword = await bcrypt.compare(password, hashedPassword);
     if (!hasCorrectPassword) {
       return res.status(401).json({ message: "unauthorize" });
     }
 
-    
-    console.log(req.session)
+    console.log(req.session);
     req.session.currentUser = user;
     return res.status(200).json(user);
   } catch (e) {

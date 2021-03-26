@@ -4,15 +4,15 @@ const Song = require("../models/Song.model");
 
 const isMongoError = ({ code: errorCode }) => errorCode === 11000;
 
-const createRoom = async (username, roomId) => {
+const createRoom = async (username, roomId, img) => {
   try {
     const room = await Room.findOne({ roomId });
-
+    console.log("imagen", img)
     if (!room) {
       //nueva sala
       const { _doc: room } = await Room.create({
         roomId,
-        users: [{ username }],
+        users: [{ username, imgUser:img }],
       });
       console.log(room);
       return room.users;
@@ -22,9 +22,9 @@ const createRoom = async (username, roomId) => {
   }
 };
 
-const joinRoom = async (username, roomId) => {
+const joinRoom = async (username, roomId, img) => {
   try {
-    
+    console.log("imagen", img)
     if(Number.isNaN(parseInt(roomId, 10))){
       return "wrongCode";
     }
@@ -38,7 +38,7 @@ const joinRoom = async (username, roomId) => {
       console.log("introduciendo nuevo player");
       const room = await Room.findOneAndUpdate(
         { roomId },
-        { $push: { users: { username } } },
+        { $push: { users: { username , imgUser:img } } },
         { new: true }
       );
       console.log(room);

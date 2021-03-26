@@ -15,6 +15,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  imgUser: {
+    type: String,
+    trim: true,
+   
+  },
   games: [{ type: mongoose.Schema.Types.ObjectId, ref: "Room" }],
 });
 

@@ -15,6 +15,11 @@ const RoomModel = new Schema({
       points: {
         type: Number,
         default: 0,
+      },
+      imgUser: {
+        type: String,
+        trim: true,
+       
       }
     },
   ],
