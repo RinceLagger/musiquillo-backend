@@ -37,7 +37,7 @@ exports.handleSockets = (io) => {
         io.to(roomId).emit("wrongCode", {});
         socket.leave(roomId);
       } else {
-        //console.log("players", players);
+        
         io.to(roomId).emit("players", { players });
       }
 
@@ -52,16 +52,16 @@ exports.handleSockets = (io) => {
 
     //recibe un audio y lo retrasmite a todos los de la misma sala
     socket.on("newAudio", ({ blob, roomId }) => {
-      // console.log(blob);
+      
       io.to(roomId).emit("newAudio", { blob });
       setTimeout(() => {
         io.to(roomId).emit("timeOver", {});
       }, 30000);
     });
 
-    socket.on("point", async ({ username, roomId }) => {
-      const players = await addPoint(username, roomId);
-      console.log("sumar punto", players);
+    socket.on("point", async ({ username, roomId, turn }) => {
+      const players = await addPoint(username, roomId, turn);
+      
       io.to(roomId).emit("updatePoints", { players });
     });
 

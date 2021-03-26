@@ -7,11 +7,6 @@ const hasCorrectPassword = (password) => {
   return passwordRegex.test(password);
 };
 
-const isMongooseValidationError = (error) =>
-  error instanceof Error.ValidationError;
-
-const isMongoError = ({ code: errorCode }) => errorCode === 11000;
-
 exports.signup = async (req, res) => {
   try {
     console.log(req.body);
@@ -23,10 +18,10 @@ exports.signup = async (req, res) => {
     }
 
     if (!hasCorrectPassword(password)) {
-      return res.status(400).json({ message: "wrong format password" });
+      return res.status(400).json({ message: "wrong password format" });
     }
     const user = await User.findOne({ username });
-    console.log(user);
+    
     if (user) {
       return res.status(400).json({ message: "user alredy exists" });
     }
@@ -43,7 +38,7 @@ exports.signup = async (req, res) => {
       "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar5_b876ad.png",
     ];
 
-    const avatarImg = avatarArray[Math.floor(Math.random() * 6)] ; 
+    const avatarImg = avatarArray[Math.floor(Math.random() * 6)];
 
     const {
       _doc: { hashedPassword, ...usuario },
@@ -53,8 +48,8 @@ exports.signup = async (req, res) => {
       hashedPassword: passwordHashed,
       imgUser: avatarImg,
     });
-    //req.session.currentUser = usuario;
-    console.log(req.session);
+    req.session.currentUser = usuario;
+    
     return res.status(200).json(usuario);
   } catch (e) {
     return res.status(400).json({ message: "wrong request" });
@@ -81,7 +76,7 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "unauthorize" });
     }
 
-    console.log(req.session);
+    
     req.session.currentUser = user;
     return res.status(200).json(user);
   } catch (e) {

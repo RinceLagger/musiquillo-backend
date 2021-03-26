@@ -97,11 +97,14 @@ const getSongs = async (numPlayers) => {
   }
 };
 
-const addPoint = async (username, roomId) => {
+const addPoint = async (username, roomId, turn) => {
   try {
     const room = await Room.findOne({ roomId });
 
     let roundWinner = room.roundWinner;
+
+    // console.log(turn)
+    // console.log(room.users[turn])
 
     const userUpdate = room.users.map((user) => {
       if (user.username !== username) {
@@ -117,6 +120,9 @@ const addPoint = async (username, roomId) => {
         return user;
       }
     });
+
+    //cada vez que alguien acierta se premia al cantante
+    userUpdate[turn].points +=5;
 
     const roomUpdate = await Room.findOneAndUpdate(
       { roomId },
