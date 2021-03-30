@@ -28,7 +28,7 @@ exports.signup = async (req, res) => {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const passwordHashed = await bcrypt.hash(password, salt);
-    console.log(passwordHashed);
+                                                                      
 
     const avatarArray = [
       "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar1_zrakdm.png",
@@ -38,7 +38,8 @@ exports.signup = async (req, res) => {
       "https://res.cloudinary.com/df2kqbhix/image/upload/v1616751761/Avatar5_b876ad.png",
     ];
 
-    const avatarImg = avatarArray[Math.floor(Math.random() * 6)];
+    const avatarImg = avatarArray[Math.floor(Math.random() * 5)];
+  
 
     const {
       _doc: { hashedPassword, ...usuario },

@@ -29,13 +29,18 @@ const joinRoom = async (username, roomId, img) => {
       return "wrongCode";
     }
     const room = await Room.findOne({ roomId });
-    console.log(room);
+
+    console.log("num players",room.users.length);
     if (room && room.status !== "start") {
       //identificador de sala ya existente
       return null;
+    } else if (room.users.length > 5) {
+      //max 6 jugadores por juego
+      
+      return "roomFull";
     } else if (room && room.status === "start") {
       //sala creada por el jugador anfitrión
-      console.log("introduciendo nuevo player");
+      
       const room = await Room.findOneAndUpdate(
         { roomId },
         { $push: { users: { username, imgUser: img } } },

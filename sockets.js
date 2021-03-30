@@ -33,7 +33,11 @@ exports.handleSockets = (io) => {
       } else if (players === "wrongCode") {
         io.to(roomId).emit("wrongCode", {});
         socket.leave(roomId);
-      } else {
+      } else if (players === "roomFull") {
+        io.to(roomId).emit("roomFull", {});
+        socket.leave(roomId);
+      }
+      else {
         io.to(roomId).emit("players", { players });
       }
     });
@@ -79,7 +83,7 @@ exports.handleSockets = (io) => {
     });
 
     socket.on("wrongGuess", ({ username, guess, roomId }) => {
-      console.log(guess);
+      
       io.to(roomId).emit("wrongGuess", { username, guess });
     });
 
